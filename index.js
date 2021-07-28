@@ -1,6 +1,6 @@
 const
   Discord = require("discord.js"),
-  config = require("../config"),
+  config = require("./config"),
   client = new Discord.Client({
     messageCacheLifetime: 30,
     messageSweepInterval: 60,
