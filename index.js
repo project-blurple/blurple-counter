@@ -37,10 +37,10 @@ client.on("messageCreate", async message => {
   } else {
     const currentCount = db.get("count") || 0;
 
-    if (
+    if (!message.content.includes("\n") && (
       message.content == `${currentCount + 1}` ||
       message.content.startsWith(`${currentCount + 1} `)
-    ) {
+    )) {
       db.add(`scores.${message.author.id}`, 1);
       db.set("count", currentCount + 1);
     } else message.delete();
