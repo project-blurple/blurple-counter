@@ -85,7 +85,7 @@ client.on("messageCreate", async message => {
 client.on("interactionCreate", async interaction => {
   if (!interaction.isCommand()) return;
 
-  const subcommand = interaction.options.getSubcommand();
+  const subcommand = interaction.options.getSubCommand();
   if (subcommand == "leaderboard") {
     const
       scores = db.get("scores") || {},
