@@ -70,14 +70,15 @@ client.on("messageCreate", async message => {
       message.react("✅").then(() => setTimeout(() => message.delete(), 5000));
     }
   } else {
-    const currentCount = db.get("count") || 0;
+    const currentCount = db.get("count") || 0, currentUser = db.get("user") || "0";
 
-    if (!message.content.includes("\n") && (
+    if (!message.content.includes("\n") && message.author.id !== currentUser && (
       message.content == `${currentCount + 1}` ||
       message.content.startsWith(`${currentCount + 1} `)
     )) {
       db.add(`scores.${message.author.id}`, 1);
       db.set("count", currentCount + 1);
+      db.set("user", message.author.id);
     } else message.delete();
   }
 });
