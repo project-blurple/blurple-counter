@@ -14,7 +14,7 @@ const
     },
     intents: [ "GUILDS", "GUILD_MESSAGES" ]
   }),
-  db = require("quick.db");
+  { count, users } = require("./storage");
 
 client.on("ready", async () => {
   console.log(`Ready as ${client.user.tag}!`);
@@ -66,19 +66,18 @@ client.on("messageCreate", async message => {
   ) {
     const newCount = parseInt(message.content.substring(1));
     if (!isNaN(newCount)) {
-      db.set("count", newCount);
+      count.set("number", newCount);
       message.react("✅").then(() => setTimeout(() => message.delete(), 5000));
     }
   } else {
-    const currentCount = db.get("count") || 0, currentUser = db.get("user") || "0";
+    const currentCount = await count.get("count") || 0, currentUser = await count.get("user") || "0";
 
     if (!message.content.includes("\n") && message.author.id !== currentUser && (
       message.content == `${currentCount + 1}` ||
       message.content.startsWith(`${currentCount + 1} `)
     )) {
-      db.add(`scores.${message.author.id}`, 1);
-      db.set("count", currentCount + 1);
-      db.set("user", message.author.id);
+      users.add(message.author.id, 1);
+      count.put({ count: currentCount + 1, user: message.author.id });
     } else message.delete();
   }
 });
@@ -86,12 +85,12 @@ client.on("messageCreate", async message => {
 client.on("interactionCreate", async interaction => {
   if (!interaction.isCommand()) return;
 
-  const subcommand = interaction.options.getSubCommand();
+  const subcommand = interaction.options.getSubcommand();
   if (subcommand == "leaderboard") {
     const
-      scores = db.get("scores") || {},
+      scores = await users.get(),
       scoresSorted = Object.keys(scores).sort((a, b) => scores[b] - scores[a]).slice(0, 10);
-    
+
     return interaction.reply({ embeds: [{
       title: "Counting leaderboard",
       color: 0x7289da,
@@ -114,12 +113,12 @@ client.on("interactionCreate", async interaction => {
       ]
     }], ephemeral: true });
   } else if (subcommand == "next") {
-    const current = db.get("count") || 0;
+    const current = await count.get("count") || 0;
     return interaction.reply({ content: `The next count in <#${config.channel}> is **${current + 1}**.`, ephemeral: true });
   } else if (subcommand == "score") {
     const
       member = interaction.options.getUser("member") || interaction.user,
-      scores = db.get("scores") || {},
+      scores = await users.get() || {},
       scoresSorted = Object.keys(scores).sort((a, b) => scores[b] - scores[a]),
       place = scores[member.id] ? scoresSorted.indexOf(member.id) + 1 : "∞",
       score = scores[member.id] || 0;
