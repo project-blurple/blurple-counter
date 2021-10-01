@@ -1,0 +1,7 @@
+version: "3"
+
+services:
+  blurple-counter:
+    build: .
+    volumes:
+      - ./storage:/app/storage
