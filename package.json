@@ -1,6 +1,11 @@
 {
   "name": "blurple-counter",
   "main": "index.js",
+  "scripts": {
+    "start": "node .",
+    "start:docker": "docker compose build && docker compose up",
+    "lint": "eslint --ext \".js\" ./"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/project-blurple/blurple-counter.git"
