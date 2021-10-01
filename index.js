@@ -90,7 +90,7 @@ client.on("interactionCreate", async interaction => {
     const
       scores = await users.get(),
       scoresSorted = Object.keys(scores).sort((a, b) => scores[b] - scores[a]).slice(0, 10);
-    
+
     return interaction.reply({ embeds: [{
       title: "Counting leaderboard",
       color: 0x7289da,
